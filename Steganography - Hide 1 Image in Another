@@ -1,0 +1,188 @@
+<h1>Hide an Image in Another Image - Steganography</h1>
+<h3>Original Images</h3>
+
+<table>
+  <tr>
+    <th>Golden Temple</th>
+    <th>Quote</th>
+  </tr>
+  <td>
+    <a href="https://farm2.staticflickr.com/1550/25513548046_b7581308aa_n.jpg"><img src="https://farm2.staticflickr.com/1550/25513548046_b7581308aa_n.jpg"></a>
+  </td>
+  <td>
+    <a href="https://farm2.staticflickr.com/1635/25513529546_05282b4cd8_n.jpg"><img src="https://farm2.staticflickr.com/1635/25513529546_05282b4cd8_n.jpg"></a>
+  </td>
+</table>
+
+<h3> Cropped Images </h3>
+
+<table>
+  <tr>
+    <th>Golden Temple (cropped)</th>
+    <th>Quote (cropped)</th>
+  </tr>
+  <tr>
+    <td>
+      <a href="https://farm2.staticflickr.com/1683/24913007463_638b802b65_n.jpg"><img src="https://farm2.staticflickr.com/1683/24913007463_638b802b65_n.jpg"></a>
+      <td>
+        <a href="https://farm2.staticflickr.com/1671/25244093330_8c8018f2f0_n.jpg"><img src="https://farm2.staticflickr.com/1671/25244093330_8c8018f2f0_n.jpg"></a>
+      </td>
+  </tr>
+</table>
+
+<h3> Resulting Combined and Hidden Images </h3>
+
+<table>
+  <tr>
+    <th>Steganography Image</th>
+    <th>Hidden Image</th>
+  </tr>
+  <tr>
+    <td>
+      <a href="https://farm2.staticflickr.com/1605/25539726525_36e37a04a9_n.jpg"><img src="https://farm2.staticflickr.com/1605/25539726525_36e37a04a9_n.jpg"></a>
+      <td>
+        <a href="https://farm2.staticflickr.com/1443/25513596296_d97f40eb4d_n.jpg"><img src="https://farm2.staticflickr.com/1443/25513596296_d97f40eb4d_n.jpg"></a>
+      </td>
+  </tr>
+</table>
+
+<h3> Algorithm</h3>
+<p>I chose the Golden Temple and a famous quote for my stegnography task. First, I used the crop function to ensure my images were the same size before chopping or combining their bits. This function looped through the original images' pixels and transferred
+  their RGB values to my new images. Next, I used the chop2Hide function to eliminate 2 bits from each image; the function pixchange converted the last bits to 0's. Afterwards, I shifted the remaining 6 bits to the right and then used the combine function
+  to hide the quote in the two lowest bits of the Golden Temple image. At this point, I created my steganographic image. To extract the hidden image, I performed the reverse process. </p>
+
+<h4> The Code </h4>
+<pre>
+// Steganography
+var bits2Hide = 2;
+var leftBits = Math.pow(2, bits2Hide);
+var rightBits = Math.pow(2, 8 - bits2Hide);
+
+var hide = new SimpleImage("GoldenTemple.jpg");
+var start = new SimpleImage("OriginalQuote.jpg");
+
+// Ensure new images are the same size as originals
+function crop(image, width, height) {
+   var croppedImage = new SimpleImage(width, height);
+   for (var px of image.values()) {
+           var x = px.getX();
+           var y = px.getY();
+       if(x < width && y < height) {
+           var newImage = croppedImage.getPixel(x,y);
+           newImage.setRed(px.getRed());
+           newImage.setBlue(px.getBlue());
+           newImage.setGreen(px.getGreen());
+       }
+    }   
+    return croppedImage;
+}
+
+// Convert last numbit's to 0's
+function pixchange(pixval) {
+    var newPixVal = Math.floor(pixval / leftBits) * leftBits;
+    return newPixVal;
+}
+
+// Clearing pixels to hide data clearing numbits of the eight bits out
+function chop2Hide(image) {
+  for (var px of image.values()) {
+      px.setRed(pixchange(px.getRed()));
+      px.setGreen(pixchange(px.getGreen()));
+      px.setBlue(pixchange(px.getBlue()));
+  }  
+  return image;
+}
+
+// Shift top (8-numbits) to right and clear out right numbits 
+function shift(image) {
+    var newImage = new SimpleImage(image.getWidth(), image.getHeight());
+    for (var px of image.values()) {
+        var x = px.getX();
+        var y = px.getY();
+        var npxvalue = newImage.getPixel(x, y);
+        npxvalue.setRed(Math.floor(px.getRed()/rightBits));
+        npxvalue.setGreen(Math.floor(px.getGreen()/rightBits));
+        npxvalue.setBlue(Math.floor(px.getBlue()/rightBits));
+    } 
+    return newImage;
+}
+
+// 
+function newpv(p, q) {
+     var pxval = p+q;
+     return answer;
+}
+
+// Create steganographic image by combining original and hidden image
+function combine(start, hide){
+        var combinedImage = new SimpleImage(start.getWidth(), start.getHeight());
+        for (var pixel of combinedImage.values()){
+        var x = pixel.getX();
+        var y = pixel.getY();
+        var pxstart = start.getPixel(x,y);
+        var pxhide = hide.getPixel(x,y);
+        
+        pixel.setRed(pxstart.getRed() + pxhide.getRed());
+        pixel.setGreen(pxstart.getGreen() + pxhide.getGreen());
+        pixel.setBlue(pxstart.getBlue() + pxhide.getBlue());
+        }
+    return combinedImage;
+}
+
+// Extract hidden image from Steganographic Image
+function extract(image){
+   var hiddenImage = new SimpleImage(image.getWidth(), image.getHeight());
+   for(var px of image.values()) {
+       var x = px.getX();
+       var y = px.getY();
+    var newpx = hiddenImage.getPixel(x, y);
+    newpx.setRed((px.getRed() - (Math.floor(px.getRed()/ leftBits) * leftBits)) * rightBits);
+    newpx.setGreen((px.getGreen() - (Math.floor(px.getGreen()/ leftBits) * leftBits)) * rightBits);
+    newpx.setBlue((px.getBlue() - (Math.floor(px.getBlue()/ leftBits) * leftBits)) * rightBits);
+   }
+   return hiddenImage;
+}
+
+// Program
+var cropWidth = start.getWidth(); {
+    if (hide.getWidth() < cropWidth) {
+        cropWidth = hide.getWidth();
+    }
+
+var cropHeight = start.getHeight();
+    if (hide.getHeight() < cropHeight) {
+        cropHeight = hide.getHeight();
+    }
+}
+
+print("Original Images");
+print(start);
+print(hide);
+
+var hcImage = crop(start, cropWidth, cropHeight);
+var hide = crop(hide, cropWidth, cropHeight);
+
+print("Cropped Images");
+print(start);
+print(hide);
+
+// Hide picture in lower half of each pixel
+
+start = chop2Hide(start, leftBits);
+var stegenographic = combine(hide, start);
+
+hide = shift(hide, leftBits);
+
+var stegenographic = combine(start, hide);
+print("Steganography Image");
+print(stegenographic);
+
+var hiddenImage = extract(stegenographic, rightBits);
+
+print("Hidden Image");
+print(hiddenImage);
+</pre>
+
+<h4>
+The hidden message is "Program testing can be used to show the presence of bugs, but never to show their absence! E. Dijkstra"
+</h4>
