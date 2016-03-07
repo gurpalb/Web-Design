@@ -1,0 +1,73 @@
+<h1> Modifying an Image </h1>
+
+<h3> Image created</h3>
+
+<p> Here is the original image. </p>
+
+<a href="https://farm2.staticflickr.com/1529/25511453006_0bc37a9f7b_m.jpg"><img src="https://farm2.staticflickr.com/1529/25511453006_0bc37a9f7b_m.jpg" width = "600" title="original" /></a>
+
+<p>
+  Here is the image I created by modifying the image.
+</p>
+
+<a href="https://farm2.staticflickr.com/1594/25511312686_afcda3afe7_m.jpg"><img src="https://farm2.staticflickr.com/1594/25511312686_afcda3afe7_m.jpg" width = "600" title="modified" /></a>
+
+</p>
+<h3> Algorithm </h3>
+
+<p>
+  I created a cage around a picture of animals to show how they would look like in captivity to an observer. First, I got the dimensions of the original image, then modifed it by: (1) putting a thick grey border of 15 pixels around the image, and then (2) putting skinnier vertical grey bars 1/8th of the width across the image. Otherwise, I just copied the original image's pixels into the new image.
+</p>
+
+<h3> Code </h3>
+
+<pre>
+// Create "cage pattern" on image
+for (var pixel of image.values()) {
+     // First, create a thick border around image
+     var x = pixel.getX();
+     var y = pixel.getY();
+     var pout = output.getPixel(x,y);
+     
+     // calculate where cage bars go
+     OneEighthX = Math.floor(w/8);
+     oneFourthX = Math.floor(w/4);
+     threeEighthX = Math.floor(3*w/8);
+     oneHalfX = Math.floor(w/2);
+     fiveEighthX = Math.floor(5*w/8);
+     twoThirdsX = Math.floor(6*w/8);
+     sevenEighthX = Math.floor(7*w/8);
+     
+     if (pixel.getX()<15 || pixel.getX() > w-15 ||
+         pixel.getY()<15 || pixel.getY() > h-15) {
+         // RGB color below  is a yellow-gold color
+         pout.setRed(130);
+         pout.setGreen(130);
+         pout.setBlue(130);
+     }
+     
+     // add seven thinner vertical bars for a window pane
+     else {
+       if (Math.abs(OneEighthX - pixel.getX())< 5 ||
+           Math.abs(oneFourthX - pixel.getX())< 5  ||
+           Math.abs(threeEighthX - pixel.getX())< 5  ||
+           Math.abs(oneHalfX - pixel.getX())< 5  ||
+           Math.abs(fiveEighthX - pixel.getX()) < 5  ||
+           Math.abs(twoThirdsX - pixel.getX()) < 5  ||
+           Math.abs(sevenEighthX - pixel.getX()) < 5)
+           {
+           pout.setRed(130);
+           pout.setGreen(130);
+           pout.setBlue(130);
+         }
+        else {
+            // just use the pixel from the original image
+            pout.setRed(pixel.getRed());
+            pout.setGreen(pixel.getGreen());
+            pout.setBlue(pixel.getBlue());
+            }
+     }
+}
+
+print(output);
+</pre>
