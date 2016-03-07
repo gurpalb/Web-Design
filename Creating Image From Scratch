@@ -1,0 +1,50 @@
+<h1> Creating an Image from Scratch </h1>
+
+<h3> Image created</h3>
+
+<p>
+  Here is the image I created.
+</p>
+
+<p>
+  <a href="https://farm2.staticflickr.com/1455/24905068894_ab34b83ced_m.jpg"><img src="https://farm2.staticflickr.com/1455/24905068894_ab34b83ced_m.jpg" title="created image" /></a>
+
+</p>
+<h3> Algorithm </h3>
+
+<p>
+  I will create an image by setting the RGB values of each pixel to different values and have some distinct shapes. First, I wote a function to create a circle. Next, I created a blank image containing 256 x 256 pixels. Aftewards, I made a red circle by
+  using if statements by specifying the location of the centre of the circle and setting pixels less than a distance of 50 to also be red. Similarly, I created a green circle but at a different location. Afterwards, I used the Math.random() function to
+  create yellow speckles in the background. Finally, I used the Math.max function to create some blue in the corners of my image.
+
+</p>
+
+<h3> Code </h3>
+
+<pre>
+// Function to make a circle
+function dist(pixel, x, y) {
+  var dx = pixel.getX() - x;
+  var dy = pixel.getY() - y;
+  return Math.sqrt(dx * dx + dy * dy)
+}
+
+// Start with a blank image
+var output = new SimpleImage(256, 256);
+
+// Make a red circle
+for (var pixel of output.values()) {
+  if (dist(pixel, 80, 80) < 50) {
+    pixel.setBlue(250 - 4 * dist(pixel, 100, 100));
+  } else if (dist(pixel, 180, 180) < 70) {
+    pixel.setRed(255 - 3 * dist(pixel, 200, 200));
+  } else if (Math.random() > 0.995) {
+    pixel.setBlue(250);
+    pixel.setRed(200);
+  }
+  pixel.setGreen(Math.max(0.6 * pixel.getY() - pixel.getX(), pixel.getX() - 0.6 * pixel.getY()));
+}
+
+// Print image
+print(output)
+</pre>
